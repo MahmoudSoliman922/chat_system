@@ -1,17 +1,30 @@
 # frozen_string_literal: true
 
+require_relative '../../serializers/application_serializer'
+
 module V1
+  # applications class
   class AppController < ApplicationController
     def index
-      # should have a service that gets all data in Application Model
+      render_json DatabaseOperations::GetAll.new(
+        Application, ApplicationSerializer
+      ).call
     end
 
     def create
-      # should have a service that inserts an item in Application Model
+      data = { name: params['name'] }
+      render_json DatabaseOperations::Create.new(
+        Application, data, ApplicationSerializer
+      ).call
     end
 
     def update
-      # should have a service that updates an item in Application Model
+      puts params
+      identifier = { application_token: params['application_token'] }
+      data = { name: params['name'] }
+      render_json DatabaseOperations::Update.new(
+        Application, identifier, data, ApplicationSerializer
+      ).call
     end
   end
 end
