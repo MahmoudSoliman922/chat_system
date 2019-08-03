@@ -23,7 +23,7 @@ module V1
       identifier = { application_token: params['application_token'] }
       data = { name: params['name'] }
       render_json DatabaseOperations::Update.new(
-        Application, identifier, data, ApplicationSerializer
+        Application, identifier, data
       ).call
     end
   end

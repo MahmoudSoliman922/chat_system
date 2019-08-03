@@ -8,7 +8,7 @@ module Shared
     end
 
     def call
-      application = Application.find_by(@application_token)
+      application = Application.find_by(application_token: @application_token)
       return application.id unless application.blank?
 
       nil
