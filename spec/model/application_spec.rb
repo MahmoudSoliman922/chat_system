@@ -23,7 +23,6 @@ RSpec.describe Application do
 
         expect(application1.application_token.blank?).to eql(false)
       end
-
     end
 
     describe 'name' do
@@ -35,7 +34,6 @@ RSpec.describe Application do
         expect(application.errors.full_messages[0]).to eql("Name can't be blank")
       end
     end
-
 
     describe 'chats_count' do
       it 'should have chats_count = 0 on create' do
