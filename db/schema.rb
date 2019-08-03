@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_02_152715) do
+ActiveRecord::Schema.define(version: 2019_08_03_145828) do
 
   create_table "applications", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
     t.string "application_token"
@@ -21,4 +21,14 @@ ActiveRecord::Schema.define(version: 2019_08_02_152715) do
     t.index ["application_token"], name: "index_applications_on_application_token"
   end
 
+  create_table "chats", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+    t.bigint "application_id"
+    t.integer "messages_count"
+    t.integer "number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["application_id"], name: "index_chats_on_application_id"
+  end
+
+  add_foreign_key "chats", "applications"
 end

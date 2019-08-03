@@ -8,7 +8,7 @@ class Application < ApplicationRecord
   # == Extensions ===========================================================
 
   # == Relationships ========================================================
-
+  has_many :chats, class_name: 'Chat'
   # == Validations ==========================================================
   validates :application_token,
             uniqueness: true
