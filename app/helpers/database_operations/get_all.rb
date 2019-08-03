@@ -2,14 +2,15 @@
 
 module DatabaseOperations
   class GetAll
-    def initialize(model_class, serializer)
+    def initialize(model_class, serializer, identifier)
       super()
       @model_class = model_class
       @serializer = serializer
+      @identifier = identifier
     end
 
     def call
-      result = @model_class.all
+      result = @model_class.where(@identifier)
       response = ActiveModelSerializers::SerializableResource.new(
         result,
         each_serializer: @serializer
