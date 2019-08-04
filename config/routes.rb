@@ -10,6 +10,10 @@ Rails.application.routes.draw do
       resources :chat,
                 only: %i[index create update],
                 controller: 'chat', param: :chat_number do
+        resources :message,
+                  only: %i[index create update],
+                  controller: 'message', param: :message_number do
+                  end
       end
     end
   end
