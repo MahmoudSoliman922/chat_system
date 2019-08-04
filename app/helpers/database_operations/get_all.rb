@@ -2,7 +2,7 @@
 
 module DatabaseOperations
   class GetAll
-    def initialize(model_class, serializer, identifier)
+    def initialize(model_class, serializer, identifier = nil)
       super()
       @model_class = model_class
       @serializer = serializer

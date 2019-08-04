@@ -6,6 +6,10 @@ module V1
   # applications class
   class AppController < ApplicationController
     def index
+      pp '==============================================='
+      $redis.set('booth', 'TESTING')
+      pp $redis.get('booth') rescue nil
+      pp '==============================================='
       render_json DatabaseOperations::GetAll.new(
         Application, ApplicationSerializer
       ).call
