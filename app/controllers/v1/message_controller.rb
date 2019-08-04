@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# require_relative '../../serializers/message_serializer'
+require_relative '../../serializers/message_serializer'
 
 module V1
   # messages class
@@ -45,7 +45,7 @@ module V1
         application_id, params['chat_chat_number']
       ).call
 
-      identifier = { chat_id: application_id, number: params['message_number'] }
+      identifier = { chat_id: chat_id, number: params['message_number'] }
       data = { body: params['body'] }
       render_json DatabaseOperations::Update.new(
         Message, identifier, data

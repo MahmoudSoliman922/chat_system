@@ -9,8 +9,8 @@ module Shared
     end
 
     def call
-      chat = Chat.find_by(application_id: @application_id, number: chat_number)
-      return chatt.id unless chat.blank?
+      chat = Chat.find_by(application_id: @application_id, number: @chat_number)
+      return chat.id unless chat.blank?
 
       nil
     end
