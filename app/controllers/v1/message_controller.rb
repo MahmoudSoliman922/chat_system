@@ -6,19 +6,26 @@ module V1
   # messages class
   class MessageController < ApplicationController
     def index
-      application_id = Shared::GetApplicationIdByToken.new(
-        params['application_application_token']
+      messages = RedisOperations::Message::GetAll.new(
+        params['application_application_token'],
+        params['chat_chat_number']
       ).call
+      response = if messages[:response].blank? == false
+                   messages
+                 else
+                   application_id = Shared::GetApplicationIdByToken.new(
+                     params['application_application_token']
+                   ).call
+                   chat_id = Shared::GetChatIdByApplicationIdAndNumber.new(
+                     application_id, params['chat_chat_number']
+                   ).call
+                   identifier = { chat_id: chat_id }
+                   DatabaseOperations::GetAll.new(
+                     Message, MessageSerializer, identifier
+                   ).call
+                 end
 
-      chat_id = Shared::GetChatIdByApplicationIdAndNumber.new(
-        application_id, params['chat_chat_number']
-      ).call
-
-      identifier = { chat_id: chat_id }
-
-      render_json DatabaseOperations::GetAll.new(
-        Message, MessageSerializer, identifier
-      ).call
+      render_json response
     end
 
     def create
@@ -30,7 +37,11 @@ module V1
         application_id, params['chat_chat_number']
       ).call
 
-      data = { chat_id: chat_id, number: params['number'], body: params['body'] }
+      number = RedisOperations::Message::Create.new(params['application_application_token'],
+                                                    params['chat_chat_number'], params['body']).call
+
+      data = { chat_id: chat_id, number: number, body: params['body'] }
+
       render_json DatabaseOperations::Create.new(
         Message, data, MessageSerializer
       ).call
@@ -46,6 +57,9 @@ module V1
       ).call
 
       identifier = { chat_id: chat_id, number: params['message_number'] }
+      RedisOperations::Message::Update.new(params['application_application_token'],
+                                        params['chat_chat_number'], params['message_number'], params['body']).call
+
       data = { body: params['body'] }
       render_json DatabaseOperations::Update.new(
         Message, identifier, data
