@@ -6,29 +6,40 @@ module V1
   # applications class
   class AppController < ApplicationController
     def index
-      pp '==============================================='
-      $redis.set('booth', 'TESTING')
-      pp $redis.get('booth') rescue nil
-      pp '==============================================='
-      render_json DatabaseOperations::GetAll.new(
-        Application, ApplicationSerializer
-      ).call
+      applications = RedisOperations::Application::GetAll.new.call
+      response = if applications.blank? == false
+                   applications
+                 else
+                   DatabaseOperations::GetAll.new(
+                     Application, ApplicationSerializer
+                   ).call
+                 end
+      render_json response
     end
 
     def create
       data = { name: params['name'] }
-      render_json DatabaseOperations::Create.new(
+      result = DatabaseOperations::Create.new(
         Application, data, ApplicationSerializer
       ).call
+      RedisOperations::Application::Create.new(params['name'], result[:redis_data].application_token).call if result[:errors].blank?
+      render_json result
     end
 
     def update
-      puts params
+      old_data = Application.find_by(application_token: params['application_token'])
       identifier = { application_token: params['application_token'] }
       data = { name: params['name'] }
-      render_json DatabaseOperations::Update.new(
+      result = DatabaseOperations::Update.new(
         Application, identifier, data
       ).call
+      if result[:errors].blank?
+        # change this to take the first 2 parameters from the request
+        RedisOperations::Application::Update.new(result[:redis_data].name,
+                                                 result[:redis_data].application_token,
+                                                 old_data.name).call
+      end
+      render_json result
     end
   end
 end

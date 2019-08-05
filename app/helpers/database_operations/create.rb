@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative '../../serializers/application_serializer'
 
 module DatabaseOperations
@@ -19,9 +20,10 @@ module DatabaseOperations
           result,
           serializer: @serializer
         )
-        return { response: response, errors: [] }
+
+        return { response: response, errors: [], redis_data: result }
       else
-        return { response: [], errors: result.errors.full_messages ||= [] }
+        return { response: [], errors: result.errors.full_messages ||= [] , redis_data: []}
       end
     end
   end
