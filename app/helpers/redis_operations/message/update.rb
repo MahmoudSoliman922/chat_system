@@ -15,9 +15,11 @@ module RedisOperations
         chat = 'application' + ':' + @token + ':' + 'chat' + ':' +
                @chat_number + ':' + 'message'
         message = chat + ':' + @message_number
-
-        $redis.hmset(message, 'body', @new_body)
-        $redis.sadd(chat, message)
+        mutex = Thread::Mutex.new
+        mutex.synchronize do
+          $redis.hmset(message, 'body', @new_body)
+          $redis.sadd(chat, message)
+        end
         @message_number
       end
     end

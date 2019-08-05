@@ -14,11 +14,14 @@ module RedisOperations
         chat = 'application' + ':' + @token + ':' + 'chat' + ':' +
                @chat_number + ':' + 'message'
         number = $redis.scard(chat) + 1
-        new_chat = chat + ':' + number.to_s
-        $redis.hmset(new_chat, 'number', number, 'body', @body)
-        $redis.sadd(chat, new_chat)
+        mutex = Thread::Mutex.new
+        mutex.synchronize do
+          new_chat = chat + ':' + number.to_s
+          $redis.hmset(new_chat, 'number', number, 'body', @body)
+          $redis.sadd(chat, new_chat)
 
-        chats = $redis.smembers(chat)
+          chats = $redis.smembers(chat)
+        end
         number
       end
     end

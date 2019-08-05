@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::API
   # render the response based on success
+
   def render_json(result)
     if result[:errors]&.length&.positive?
       render(json: { success: false, response: [], errors: result[:errors] },
