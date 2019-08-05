@@ -1,48 +1,63 @@
 version: '2'
 
 services:
-  db:
-    image: mysql:5.7
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: chat_system
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: password
-    ports:
-      - "3307:3306"
+    db:
+        image: mysql:5.7
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: chat_system
+            MYSQL_USER: appuser
+            MYSQL_PASSWORD: password
+        ports:
+            - '3307:3306'
 
-  redis:
-    image: redis:4.0-alpine
-    command: redis-server
+    redis:
+        image: redis:4.0-alpine
+        command: redis-server
 
-  sidekiq:
-    build: .
-    command: bundle exec sidekiq
-    depends_on:
-      - redis
-    volumes:
-      - .:/myapp
-    env_file:
-      - .env
-    environment: 
-      JOB_WORKER_URL: redis://redis:6379/0
+    sidekiq:
+        build: .
+        command: bundle exec sidekiq
+        depends_on:
+            - redis
+        volumes:
+            - .:/myapp
+        env_file:
+            - .env
+        environment:
+            JOB_WORKER_URL: redis://redis:6379/0
 
+    web:
+        build: .
+        command: bundle exec rails s -p 3000 -b '0.0.0.0'
+        volumes:
+            - .:/myapp
+        ports:
+            - '3000:3000'
+        depends_on:
+            - db
+            - sidekiq
+        env_file:
+            - .env
+        environment:
+            DB_USER: appuser
+            DB_NAME: chat_system
+            DB_PASSWORD: password
+            DB_HOST: db
 
-  web:
-    build: .
-    command: bundle exec rails s -p 3000 -b '0.0.0.0'
-    volumes:
-      - .:/myapp
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-      - sidekiq
-    env_file:
-      - .env
-    environment:
-      DB_USER: appuser
-      DB_NAME: chat_system
-      DB_PASSWORD: password
-      DB_HOST: db
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:5.5.3
+        environment:
+            - cluster.name=docker-cluster
+            - bootstrap.memory_lock=true
+            - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+            - xpack.security.enabled=false
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - .:/myapp
+        ports:
+            - 9200:9200
