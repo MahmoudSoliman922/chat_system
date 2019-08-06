@@ -12,19 +12,13 @@ module RedisOperations
       end
 
       def call
-        chat = 'application' + ':' + @token + ':' + 'chat' + ':' +
-               @chat_number + ':' + 'message'
+        chat = 'application:' + @token + ':chat:' +
+               @chat_number + ':message'
         message = chat + ':' + @message_number
         mutex = Thread::Mutex.new
-        if RedisOperations::Message::Validations.new(@token, @chat_number,
-                                                     @body, @message_number).update
-          mutex.synchronize do
-            $redis.hmset(message, 'body', @body)
-            $redis.sadd(chat, message)
-          end
-          { number: @message_number, success: true }
-        else
-          { number: nil, success: false }
+        mutex.synchronize do
+          $redis.hmset(message, 'body', @body)
+          $redis.sadd(chat, message)
         end
       end
     end

@@ -6,12 +6,18 @@ module RedisOperations
       def initialize(token, number = nil, new_token = nil)
         super()
         @application = $redis.exists('application:' + token)
-        @chat = $redis.exists('application:' + token + ':chat:' + number)
-        @new_application = $redis.exists('application' + ':' + new_token)
+        unless number.blank?
+          @chat = $redis.exists('application:' + token +
+            ':chat:' + number)
+        end
+        unless new_token.blank?
+          @new_application = $redis.exists('application:' +
+             new_token)
+        end
       end
 
       def create
-        @pplication == true
+        @application == true
       end
 
       def update

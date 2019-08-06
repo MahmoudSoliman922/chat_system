@@ -7,9 +7,7 @@ class UpdateMessageJob < ApplicationJob
 
   def perform(message_number, body, token,
               chat_number)
-    application_id = Shared::GetApplicationIdByToken.new(
-      token
-    ).call
+    application_id = Shared::GetApplicationIdByToken.new(token).call
     chat_id = Shared::GetChatIdByApplicationIdAndNumber.new(
       application_id, chat_number
     ).call

@@ -55,7 +55,7 @@ module V1
         UpdateMessageJob.perform_later(params['message_number'], params['body'],
                                        params['application_application_token'],
                                        params['chat_chat_number'])
-        render_json send_success(nil)
+        render_json send_success
       else
         render_json send_error
       end

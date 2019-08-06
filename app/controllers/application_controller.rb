@@ -16,7 +16,7 @@ class ApplicationController < ActionController::API
     { errors: ['please provide a valid data'], response: [] }
   end
 
-  def send_success(data)
+  def send_success(data = nil)
     if data.blank?
       { errors: [], response: [] }
     else

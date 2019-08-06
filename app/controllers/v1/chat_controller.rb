@@ -22,31 +22,28 @@ module V1
     end
 
     def create
-      application_id = Shared::GetApplicationIdByToken.new(
-        params['application_application_token']
-      ).call
-      number = RedisOperations::Chat::Create.new(params['application_application_token']).call
-      data = { application_id: application_id, number: number }
-      InsertChatJob.perform_later(data)
-      response = { errors: [], response: [{ number: number }] }
-      render_json response
+      if RedisOperations::Chat::Validations.new(params['application_application_token']).create
+        number = RedisOperations::Chat::Create.new(params['application_application_token']).call
+        InsertChatJob.perform_later(number, params['application_application_token'])
+        render_json send_success(number: number)
+      else
+        render_json send_error
+      end
     end
 
     def update
-      application_id = Shared::GetApplicationIdByToken.new(
-        params['application_application_token']
-      ).call
-      new_application_id = Shared::GetApplicationIdByToken.new(
-        params['new_application_token']
-      ).call
-      identifier = { application_id: application_id, number: params['chat_number'] }
-      RedisOperations::Chat::Update.new(params['application_application_token'],
-                                        params['chat_number'], params['new_application_token']).call
-
-      data = { application_id: new_application_id }
-      render_json DatabaseOperations::Update.new(
-        Chat, identifier, data
-      ).call
+      if RedisOperations::Chat::Validations.new(params['application_application_token'],
+                                                params['chat_number'],
+                                                params['new_application_token']).update
+        RedisOperations::Chat::Update.new(params['application_application_token'],
+                                          params['chat_number'], params['new_application_token']).call
+        UpdateChatJob.perform_later(params['application_application_token'],
+                                    params['chat_number'],
+                                    params['new_application_token'])
+        render_json send_success
+      else
+        render_json send_error
+      end
     end
   end
 end
