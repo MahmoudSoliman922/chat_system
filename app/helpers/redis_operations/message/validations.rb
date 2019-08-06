@@ -7,11 +7,11 @@ module RedisOperations
                      message_number = nil)
         super()
         @body = body
-        @application = $redis.exists('application' + ':' + token)
+        @application = $redis.exists('application:' + token)
         @chat = $redis.exists('application:' + token + ':chat:' + chat_number)
         unless message_number.nil?
           @message = $redis.exists('application:' + token + ':chat:' +
-             chat_number + ':' + message_number)
+             chat_number + ':message:' + message_number)
         end
       end
 

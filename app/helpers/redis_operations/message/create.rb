@@ -14,18 +14,13 @@ module RedisOperations
         chat = 'application:' + @token + ':chat:' +
                @chat_number + ':message'
         number = $redis.scard(chat) + 1
-        if RedisOperations::Message::Validations.new(@token, @chat_number,
-                                                     @body).create
-          mutex = Thread::Mutex.new
-          mutex.synchronize do
-            new_chat = chat + ':' + number.to_s
-            $redis.hmset(new_chat, 'number', number, 'body', @body)
-            $redis.sadd(chat, new_chat)
-          end
-          { response: number, success: true }
-        else
-          { number: nil, success: false }
+        mutex = Thread::Mutex.new
+        mutex.synchronize do
+          new_chat = chat + ':' + number.to_s
+          $redis.hmset(new_chat, 'number', number, 'body', @body)
+          $redis.sadd(chat, new_chat)
         end
+        number
       end
     end
   end

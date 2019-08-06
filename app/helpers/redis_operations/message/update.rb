@@ -3,11 +3,11 @@
 module RedisOperations
   module Message
     class Update
-      def initialize(token, chat_number, message_number, new_body)
+      def initialize(token, chat_number, message_number, body)
         super()
         @token = token
         @chat_number = chat_number
-        @new_body = new_body
+        @body = body
         @message_number = message_number
       end
 
@@ -19,7 +19,7 @@ module RedisOperations
         if RedisOperations::Message::Validations.new(@token, @chat_number,
                                                      @body, @message_number).update
           mutex.synchronize do
-            $redis.hmset(message, 'body', @new_body)
+            $redis.hmset(message, 'body', @body)
             $redis.sadd(chat, message)
           end
           { number: @message_number, success: true }

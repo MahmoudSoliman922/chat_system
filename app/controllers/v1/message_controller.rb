@@ -29,40 +29,36 @@ module V1
     end
 
     def create
-      response = nil
-      validation = RedisOperations::Message::Create.new(params['application_application_token'],
-                                                        params['chat_chat_number'], params['body']).call
-      if validation[:success] == true
-        application_id = Shared::GetApplicationIdByToken.new(
-          params['application_application_token']
-        ).call
-        chat_id = Shared::GetChatIdByApplicationIdAndNumber.new(
-          application_id, params['chat_chat_number']
-        ).call
-        data = { chat_id: chat_id, number: validation[:response], body: params['body'] }
-        InsertMessageJob.perform_later(data)
-        response = { errors: [], response: [{ number: validation[:response] }] }
+      if RedisOperations::Message::Validations.new(params['application_application_token'],
+                                                   params['chat_chat_number'],
+                                                   params['body']).create
+        number = RedisOperations::Message::Create.new(params['application_application_token'],
+                                                      params['chat_chat_number'],
+                                                      params['body']).call
+        InsertMessageJob.perform_later(number, params['body'],
+                                       params['application_application_token'],
+                                       params['chat_chat_number'])
+        render_json send_success(number: number)
       else
-        response = { errors: ['please provide a valid data'], response: [] }
+        render_json send_error
       end
-      render_json response
     end
 
     def update
-      application_id = Shared::GetApplicationIdByToken.new(
-        params['application_application_token']
-      ).call
-      chat_id = Shared::GetChatIdByApplicationIdAndNumber.new(
-        application_id, params['chat_chat_number']
-      ).call
-      RedisOperations::Message::Update.new(params['application_application_token'],
-                                           params['chat_chat_number'], params['message_number'], params['body']).call
-
-      data = { body: params['body'] }
-      identifier = { chat_id: chat_id, number: params['message_number'] }
-      render_json DatabaseOperations::Update.new(
-        Message, identifier, data
-      ).call
+      if RedisOperations::Message::Validations.new(params['application_application_token'],
+                                                   params['chat_chat_number'],
+                                                   params['body'], params['message_number']).update
+        RedisOperations::Message::Update.new(params['application_application_token'],
+                                             params['chat_chat_number'],
+                                             params['message_number'],
+                                             params['body']).call
+        UpdateMessageJob.perform_later(params['message_number'], params['body'],
+                                       params['application_application_token'],
+                                       params['chat_chat_number'])
+        render_json send_success(nil)
+      else
+        render_json send_error
+      end
     end
 
     def search
