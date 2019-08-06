@@ -39,9 +39,9 @@ module V1
                                                     params['chat_chat_number'], params['body']).call
 
       data = { chat_id: chat_id, number: number, body: params['body'] }
-      render_json DatabaseOperations::Create.new(
-        Message, data, MessageSerializer
-      ).call
+      InsertMessageJob.perform_later(data)
+      response = { errors: [], response: [{ number: number }] }
+      render_json response
     end
 
     def update

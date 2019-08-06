@@ -27,10 +27,9 @@ module V1
       ).call
       number = RedisOperations::Chat::Create.new(params['application_application_token']).call
       data = { application_id: application_id, number: number }
-
-      render_json DatabaseOperations::Create.new(
-        Chat, data, ChatSerializer
-      ).call
+      InsertChatJob.perform_later(data)
+      response = { errors: [], response: [{ number: number }] }
+      render_json response
     end
 
     def update
