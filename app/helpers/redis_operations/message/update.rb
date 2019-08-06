@@ -16,11 +16,16 @@ module RedisOperations
                @chat_number + ':' + 'message'
         message = chat + ':' + @message_number
         mutex = Thread::Mutex.new
-        mutex.synchronize do
-          $redis.hmset(message, 'body', @new_body)
-          $redis.sadd(chat, message)
+        if RedisOperations::Message::Validations.new(@token, @chat_number,
+                                                     @body, @message_number).update
+          mutex.synchronize do
+            $redis.hmset(message, 'body', @new_body)
+            $redis.sadd(chat, message)
+          end
+          { number: @message_number, success: true }
+        else
+          { number: nil, success: false }
         end
-        @message_number
       end
     end
   end

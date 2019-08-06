@@ -11,20 +11,23 @@ module RedisOperations
       end
 
       def call
-        old_chat = 'application' + ':' + @old_token + ':' + 'chat' + ':' + @number
-        old_application = 'application' + ':' + @old_token + ':' + 'chat'
-        new_applicaton = 'application' + ':' + @new_token + ':' + 'chat'
+        old_chat = 'application:' + @old_token + ':chat:' + @number
+        old_application = 'application:' + @old_token + ':chat'
+        new_applicaton = 'application:' + @new_token + ':chat'
         number = $redis.scard(new_applicaton) + 1
-        mutex = Thread::Mutex.new
-        mutex.synchronize do
-          new_chat = 'application' + ':' + @new_token + ':' + 'chat' + ':' + number.to_s
-
-          $redis.hmset(new_chat, 'number', number)
-          $redis.sadd(new_applicaton, new_chat)
-          $redis.srem(old_application, old_chat)
-          $redis.del(old_chat)
+        if RedisOperations::Chat::Validations.new(@old_token, @number, @new_token).update
+          mutex = Thread::Mutex.new
+          mutex.synchronize do
+            new_chat = 'application:' + @new_token + ':chat:' + number.to_s
+            $redis.hmset(new_chat, 'number', number)
+            $redis.sadd(new_applicaton, new_chat)
+            $redis.srem(old_application, old_chat)
+            $redis.del(old_chat)
+          end
+          { number: number, success: true }
+        else
+          { number: nil, success: false }
         end
-        number
       end
     end
   end

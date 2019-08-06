@@ -29,18 +29,22 @@ module V1
     end
 
     def create
-      application_id = Shared::GetApplicationIdByToken.new(
-        params['application_application_token']
-      ).call
-      chat_id = Shared::GetChatIdByApplicationIdAndNumber.new(
-        application_id, params['chat_chat_number']
-      ).call
-      number = RedisOperations::Message::Create.new(params['application_application_token'],
-                                                    params['chat_chat_number'], params['body']).call
-
-      data = { chat_id: chat_id, number: number, body: params['body'] }
-      InsertMessageJob.perform_later(data)
-      response = { errors: [], response: [{ number: number }] }
+      response = nil
+      validation = RedisOperations::Message::Create.new(params['application_application_token'],
+                                                        params['chat_chat_number'], params['body']).call
+      if validation[:success] == true
+        application_id = Shared::GetApplicationIdByToken.new(
+          params['application_application_token']
+        ).call
+        chat_id = Shared::GetChatIdByApplicationIdAndNumber.new(
+          application_id, params['chat_chat_number']
+        ).call
+        data = { chat_id: chat_id, number: validation[:response], body: params['body'] }
+        InsertMessageJob.perform_later(data)
+        response = { errors: [], response: [{ number: validation[:response] }] }
+      else
+        response = { errors: ['please provide a valid data'], response: [] }
+      end
       render_json response
     end
 

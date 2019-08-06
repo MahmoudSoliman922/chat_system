@@ -11,16 +11,21 @@ module RedisOperations
       end
 
       def call
-        chat = 'application' + ':' + @token + ':' + 'chat' + ':' +
-               @chat_number + ':' + 'message'
+        chat = 'application:' + @token + ':chat:' +
+               @chat_number + ':message'
         number = $redis.scard(chat) + 1
-        mutex = Thread::Mutex.new
-        mutex.synchronize do
-          new_chat = chat + ':' + number.to_s
-          $redis.hmset(new_chat, 'number', number, 'body', @body)
-          $redis.sadd(chat, new_chat)
+        if RedisOperations::Message::Validations.new(@token, @chat_number,
+                                                     @body).create
+          mutex = Thread::Mutex.new
+          mutex.synchronize do
+            new_chat = chat + ':' + number.to_s
+            $redis.hmset(new_chat, 'number', number, 'body', @body)
+            $redis.sadd(chat, new_chat)
+          end
+          { response: number, success: true }
+        else
+          { number: nil, success: false }
         end
-        number
       end
     end
   end
