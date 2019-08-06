@@ -34,6 +34,10 @@ gem 'sidekiq-unique-jobs'
 gem 'sinatra', require: nil
 gem 'rspec', '3.8.0'
 gem 'rack-cors', require: 'rack/cors'
+
+# elastic-search to handle full-text-search
+gem 'elasticsearch-model', '~> 5.0.0'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
