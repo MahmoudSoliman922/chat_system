@@ -32,16 +32,13 @@ module V1
       application_id = Shared::GetApplicationIdByToken.new(
         params['application_application_token']
       ).call
-
       chat_id = Shared::GetChatIdByApplicationIdAndNumber.new(
         application_id, params['chat_chat_number']
       ).call
-
       number = RedisOperations::Message::Create.new(params['application_application_token'],
                                                     params['chat_chat_number'], params['body']).call
 
       data = { chat_id: chat_id, number: number, body: params['body'] }
-
       render_json DatabaseOperations::Create.new(
         Message, data, MessageSerializer
       ).call
@@ -51,19 +48,22 @@ module V1
       application_id = Shared::GetApplicationIdByToken.new(
         params['application_application_token']
       ).call
-
       chat_id = Shared::GetChatIdByApplicationIdAndNumber.new(
         application_id, params['chat_chat_number']
       ).call
-
-      identifier = { chat_id: chat_id, number: params['message_number'] }
       RedisOperations::Message::Update.new(params['application_application_token'],
-                                        params['chat_chat_number'], params['message_number'], params['body']).call
+                                           params['chat_chat_number'], params['message_number'], params['body']).call
 
       data = { body: params['body'] }
+      identifier = { chat_id: chat_id, number: params['message_number'] }
       render_json DatabaseOperations::Update.new(
         Message, identifier, data
       ).call
+    end
+
+    def search
+      result = Shared::SearchOnMessages.new(params['keyword']).call
+      render_json result
     end
   end
 end
