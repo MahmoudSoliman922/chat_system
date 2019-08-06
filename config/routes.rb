@@ -13,6 +13,9 @@ Rails.application.routes.draw do
         resources :message,
                   only: %i[index create update],
                   controller: 'message', param: :message_number do
+                    collection do
+                      get 'search'
+                    end
                   end
       end
     end

@@ -19,8 +19,6 @@ module RedisOperations
           new_chat = chat + ':' + number.to_s
           $redis.hmset(new_chat, 'number', number, 'body', @body)
           $redis.sadd(chat, new_chat)
-
-          chats = $redis.smembers(chat)
         end
         number
       end
