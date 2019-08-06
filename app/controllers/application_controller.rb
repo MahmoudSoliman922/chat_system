@@ -11,4 +11,16 @@ class ApplicationController < ActionController::API
       render(json: { success: true, response: result[:response], errors: [] })
     end
   end
+
+  def send_error
+    { errors: ['please provide a valid data'], response: [] }
+  end
+
+  def send_success(data = nil)
+    if data.blank?
+      { errors: [], response: [] }
+    else
+      { errors: [], response: [data] }
+    end
+  end
 end

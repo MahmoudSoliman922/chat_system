@@ -11,8 +11,8 @@ module RedisOperations
       end
 
       def call
-        chat = 'application' + ':' + @token + ':' + 'chat' + ':' +
-               @chat_number + ':' + 'message'
+        chat = 'application:' + @token + ':chat:' +
+               @chat_number + ':message'
         number = $redis.scard(chat) + 1
         mutex = Thread::Mutex.new
         mutex.synchronize do
