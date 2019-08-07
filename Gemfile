@@ -24,14 +24,24 @@ gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
 gem 'redis'
+gem 'redis-namespace'
+gem 'redis-rails'
+gem 'redis-rack-cache'
+# Use Sidekiq to handle background jobs
 gem 'sidekiq'
 gem 'sidekiq-scheduler'
 gem 'sidekiq-unique-jobs'
 gem 'sinatra', require: nil
+gem 'rspec', '3.8.0'
+gem 'rack-cors', require: 'rack/cors'
+
+# elastic-search to handle full-text-search
+gem 'elasticsearch-model', '~> 5.0.0'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
+gem 'active_model_serializers'
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'
 
