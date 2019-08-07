@@ -2,6 +2,7 @@ version: '2'
 
 services:
     db:
+        container_name: mysql
         image: mysql:5.7
         restart: always
         environment:
@@ -9,12 +10,15 @@ services:
             MYSQL_DATABASE: chat_system
             MYSQL_USER: appuser
             MYSQL_PASSWORD: password
-
+        ports:
+            - "5432:5432"
     redis:
+        container_name: redis
         image: redis:4.0-alpine
         command: redis-server
 
     sidekiq:
+        container_name: sidekiq
         build: .
         command: bundle exec sidekiq
         depends_on:
@@ -32,6 +36,8 @@ services:
             DB_HOST: db
 
     web:
+        container_name: rails
+        entrypoint: ["./wait-for-it.sh", "db:5432","--", bin/entry]
         build: .
         command: bundle exec rails s -p 3000 -b '0.0.0.0'
         volumes:
@@ -50,6 +56,7 @@ services:
             DB_HOST: db
 
     elasticsearch:
+        container_name: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:5.5.3
         environment:
             - cluster.name=docker-cluster
