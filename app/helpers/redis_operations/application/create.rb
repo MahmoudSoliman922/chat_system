@@ -5,8 +5,8 @@ module RedisOperations
     class Create
       def initialize(name, token)
         super()
-        @name = name
-        @token = token
+        @name = name.to_s
+        @token = token.to_s
       end
 
       def call

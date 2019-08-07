@@ -16,5 +16,8 @@ class InsertMessageJob < ApplicationJob
     DatabaseOperations::Create.new(
       Message, data, MessageSerializer
     ).call
+    DatabaseOperations::Update.new(
+      Chat, { application_id: application_id }, messages_count: message_number
+    ).call
   end
 end

@@ -5,10 +5,10 @@ module RedisOperations
     class Update
       def initialize(token, chat_number, message_number, body)
         super()
-        @token = token
-        @chat_number = chat_number
-        @body = body
-        @message_number = message_number
+        @token = token.to_s
+        @chat_number = chat_number.to_s
+        @body = body.to_s
+        @message_number = message_number.to_s
       end
 
       def call
