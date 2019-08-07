@@ -61,9 +61,9 @@ module V1
       end
     end
 
-    def search
-      result = Shared::SearchOnMessages.new(params['keyword']).call
-      render_json result
-    end
+    # def search
+    #   result = Shared::SearchOnMessages.new(params['keyword']).call
+    #   render_json result
+    # end
   end
 end
