@@ -18,7 +18,7 @@ User should deal with *applications* through providing `token`, *chats* through 
 
 * Clone this repo to your local machine.
 * install `docker` and `docker-compose`
-* run the project with `docker-compose up` and you should be good to go, no need to bundle build or migrate.
+* run the project with `docker-compose up` and you should be good to go, no need to bundle install or migrate.
 
 ## How to run the test suite
 
