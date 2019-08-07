@@ -5,9 +5,9 @@ module RedisOperations
     class Create
       def initialize(token, chat_number, body)
         super()
-        @token = token
-        @chat_number = chat_number
-        @body = body
+        @token = token.to_s
+        @chat_number = chat_number.to_s
+        @body = body.to_s
       end
 
       def call

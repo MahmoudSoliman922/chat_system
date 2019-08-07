@@ -31,19 +31,19 @@ module V1
       end
     end
 
-    def update
-      if RedisOperations::Chat::Validations.new(params['application_application_token'],
-                                                params['chat_number'],
-                                                params['new_application_token']).update
-        RedisOperations::Chat::Update.new(params['application_application_token'],
-                                          params['chat_number'], params['new_application_token']).call
-        UpdateChatJob.perform_later(params['application_application_token'],
-                                    params['chat_number'],
-                                    params['new_application_token'])
-        render_json send_success
-      else
-        render_json send_error
-      end
-    end
+    # def update
+    #   if RedisOperations::Chat::Validations.new(params['application_application_token'],
+    #                                             params['chat_number'],
+    #                                             params['new_application_token']).update
+    #     RedisOperations::Chat::Update.new(params['application_application_token'],
+    #                                       params['chat_number'], params['new_application_token']).call
+    #     UpdateChatJob.perform_later(params['application_application_token'],
+    #                                 params['chat_number'],
+    #                                 params['new_application_token'])
+    #     render_json send_success
+    #   else
+    #     render_json send_error
+    #   end
+    # end
   end
 end

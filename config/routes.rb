@@ -8,7 +8,7 @@ Rails.application.routes.draw do
     resources :application, controller: 'app', only: %i[index create update],
                             param: :application_token do
       resources :chat,
-                only: %i[index create update],
+                only: %i[index create],
                 controller: 'chat', param: :chat_number do
         resources :message,
                   only: %i[index create update],
