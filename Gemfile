@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
@@ -37,7 +37,7 @@ gem 'rack-cors', require: 'rack/cors'
 
 # elastic-search to handle full-text-search
 gem 'elasticsearch-model', '~> 5.0.0'
-
+gem 'multi_json', '1.13.1'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
